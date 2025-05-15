@@ -39,7 +39,7 @@ def U(x0, z0, x1, z1, x, z, rho):
     return u
 
 
-# 自定义损失函数
+# Custom loss function
 class PhyLoss(nn.Module):
     def __init__(self, x0, z0, x1, z1, x, z,s_l):
         super(PhyLoss, self).__init__()
@@ -50,7 +50,7 @@ class PhyLoss(nn.Module):
         self.x = x
         self.z = z
         self.lambda_factor = 2 * torch.pi
-        self.s_l = s_l  # 标签电阻
+        self.s_l = s_l  #Label resistance
     
     
     def forward(self, rho):
@@ -75,23 +75,23 @@ def train_net(net, device, dataset, epochs=1000, batch_size=3, lr=0.00001):
     optimizer = optim.Adam(net.parameters(), lr=lr, weight_decay=1e-8)
     
     # criterion = nn.SmoothL1Loss().cuda()
-    # best_loss统计，初始化为正无穷
+    #Best_Loss statistics, initialized to positive infinity
     best_loss = float('inf')
-    # 训练epochs次
+    #Train epochs times
     for epoch in range(epochs):
-        # 训练模式
+        #Training mode
         net.train()
-        # 按照batch_size开始训练
+        #Start training
         for xx_train, yy_train in train_loader:
             optimizer.zero_grad()
-            # 将数据拷贝到device中
+            
             i1 = xx_train[:,3:,:,:].to(device=device, dtype=torch.float32)
             i2 = xx_train[:,0:3,:,:].to(device=device, dtype=torch.float32)
     
             label = yy_train.to(device=device, dtype=torch.float32)
-            # 使用网络参数，输出预测结果
+            # Using network parameters to output prediction results
             pred = net(i1,i2)
-            # 计算loss
+            # Calculate loss
             phy = PhyLoss(l_ax, l_az, l_bx, l_bz, l_mx, l_mz, label)
             loss_phy = phy(pred)
 
@@ -101,11 +101,11 @@ def train_net(net, device, dataset, epochs=1000, batch_size=3, lr=0.00001):
             loss = loss_mse + 0*loss_phy
 
             print('Loss/train', loss.item())
-            # 保存loss值最小的网络参数
+            # Save the network parameter with the minimum loss value
             if loss < best_loss:
                 best_loss = loss
                 torch.save(net.state_dict(), '1l+0l_best_model.pth')
-            # 更新参数
+            # Update parameters
             loss.backward()
             optimizer.step()
         Loss.append(loss.item())
@@ -122,11 +122,11 @@ if __name__ == "__main__":
     l_mz = torch.tensor(np.load('Loc_Mz.npy')).cuda()
     
     # start = time.perf_counter()
-    # # 加载数据
-    # filepath1 = "C:/Users/DELL/Desktop/孙晓晨/合并数据2/"
+    # #Load data
+    # filepath1 = "C:/Users/DELL/Desktop/合并数据2/"
     # pathdir1 = os.listdir(filepath1)
     
-    # filepath2 = "C:/Users/DELL/Desktop/孙晓晨/label2/"
+    # filepath2 = "C:/Users/DELL/Desktop/label2/"
     # pathdir2 = os.listdir(filepath2)
     
     # x_train, x_test, y_train, y_test = train_test_split(pathdir1, pathdir2, test_size=0.1,random_state=1994)
@@ -160,13 +160,13 @@ if __name__ == "__main__":
     # net = PhyFusNet(channel_in_i1=1,channel_in_i2=3)
     
     # net.to(device=device)
-    # # 开始训练
+    # #Start training
     # train_net(net, device, dataset)
     # end = time.perf_counter()
     # print("运行时间为", round(end - start), 'seconds')
 
     #ceshi
-    # filepath3 = "C:/Users/DELL/Desktop/孙晓晨/测试集/"
+    # filepath3 = "C:/Users/DELL/Desktop/测试集/"
     # pathdir3 = os.listdir(filepath3)
     # r5 = []
     # for file in pathdir3:
@@ -183,7 +183,7 @@ if __name__ == "__main__":
     # plt.imshow(a)
     
 
-    #现场数据测试
+    #d ata testing
     f_path = 'E:/物理信息网络/数据集/现场数据/数据组合/'
     pathdir = os.listdir(f_path)
     net = PhyFusNet(channel_in_i1=1,channel_in_i2=3).to(device)
