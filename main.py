@@ -188,7 +188,7 @@ if __name__ == "__main__":
     pathdir = os.listdir(f_path)
     net = PhyFusNet(channel_in_i1=1,channel_in_i2=3).to(device)
     net.load_state_dict(torch.load('D:/博士期间/物理信息网络/epoch=1000/1l+2l_best_model.pth'))
-    # d = np.load('E:/物理信息网络/数据集/现场数据/数据组合/5.22-11.06.npy')
+    
     
     f_d = []
     for file in pathdir:
